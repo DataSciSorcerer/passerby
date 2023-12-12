@@ -1,6 +1,8 @@
 <template>
-    <vue-particles id="tsparticles" :particlesInit="particlesInit" url="http://foo.bar/particles.json" />
-    <vue-particles id="tsparticles" :particlesInit="particlesInit" :options="background" />
+    <vue-particles id="tsparticles" :particlesInit="particlesInit" :particlesLoaded="particlesLoaded"
+        url="http://foo.bar/particles.json" />
+    <vue-particles id="tsparticles" :particlesInit="particlesInit" :particlesLoaded="particlesLoaded"
+        :options="background" />
     <div class="navbar fixed">
         <!-- Change theme -->
         <label class="swap swap-rotate">
@@ -19,7 +21,7 @@
         <a class="btn btn-ghost ml-2 btn-circle"><icon-translate size="26" /></a>
         <!-- Change screen -->
         <label class="swap swap-rotate">
-            <input type="checkbox" @v-model="changeScreenValue" />
+            <input type="checkbox" />
             <!-- full screen icon -->
             <a class="btn btn-ghost btn-circle swap-off" @click="changeScreen">
                 <icon-full-screen size="26" />
@@ -76,13 +78,19 @@ const particlesInit = async (engine) => {
     await loadSlim(engine);
 };
 
-const changeScreenValue = ref(true)
-const changeScreen = () => {
-    changeScreen.value = !changeScreen.value
-    console.log(changeScreen.value)
+const particlesLoaded = async container => {
+    console.log("Particles container loaded", container);
+};
 
-    if (changeScreen) {
-        // 进入全屏
+
+const changeScreenValue = ref(true);
+
+const changeScreen = () => {
+    changeScreenValue.value = !changeScreenValue.value;
+    console.log(changeScreenValue.value);
+
+    if (changeScreenValue.value) {
+        // Enter fullscreen
         const element = document.documentElement;
 
         if (element.requestFullscreen) {
@@ -94,10 +102,19 @@ const changeScreen = () => {
         } else if (element.msRequestFullscreen) {
             element.msRequestFullscreen();
         }
-    }else{
-        
+    } else {
+        // Exit fullscreen
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
     }
-}
+};
 
 const randomAvatar = () => {
     const firstName = [
@@ -164,7 +181,7 @@ const randomAvatar = () => {
     ];
 
     function getRandomEmoji() {
-        // Emoji 的 Unicode 范围
+        // Emoji 的 Unicode 码点范围
         const emojiRangeStart = 0x1F601;
         const emojiRangeEnd = 0x1F64F;
 
