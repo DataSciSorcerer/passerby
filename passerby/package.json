@@ -9,9 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@icon-park/vue-next": "^1.4.2",
+    "lottie-web-vue": "^2.0.7",
     "pinia": "^2.1.7",
+    "tsparticles-slim": "^2.12.0",
     "vue": "^3.3.8",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.2.5",
+    "vue3-particles": "^2.12.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.0",
