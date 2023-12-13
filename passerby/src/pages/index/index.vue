@@ -16,9 +16,19 @@
                 <icon-moon size="26" />
             </a>
         </label>
-
+        <!-- change music -->
         <a class="btn btn-ghost ml-2 btn-circle"><icon-music size="26" /></a>
-        <a class="btn btn-ghost ml-2 btn-circle"><icon-translate size="26" /></a>
+        <!-- change language -->
+        <details class="dropdown">
+            <summary class="m-1 btn btn-ghost ml-2 btn-circle"><icon-translate size="26" /></summary>
+            <ul class="p-2 shadow menu dropdown-content z-20 bg-base-100 rounded-box w-48">
+                <li @click="useLanguageStore.changeLanguage('zh')"><a class="text-xl">🀄中文</a></li>
+                <li @click="useLanguageStore.changeLanguage('fr')"><a class="text-xl">🍷France</a></li>
+                <li @click="useLanguageStore.changeLanguage('en')"><a class="text-xl">🗽English</a></li>
+                <li @click="useLanguageStore.changeLanguage('jp')"><a class="text-xl">🎎日本語</a></li>
+            </ul>
+        </details>
+
         <!-- Change screen -->
         <label class="swap swap-rotate">
             <input type="checkbox" />
@@ -36,8 +46,8 @@
         <div class="form">
             <!-- Title -->
             <div class="title">
-                <span class="z-10 mx-auto">Welcome</span>
-                <LottieAnimation :animation-data="snowman" :loop="true" class="text-1xl" />
+                <span class="z-10 mx-auto">{{ useLanguageStore.pages[currentPath][nowLanguage].title }}</span>
+                <!-- <LottieAnimation :animation-data="snowman" :loop="true" class="text-1xl" /> -->
             </div>
             <!-- avatar -->
             <div class="avatar mx-auto">
@@ -46,7 +56,7 @@
                 </div>
             </div>
             <!-- input -->
-            <input type="text" v-model="name" @input="randomInput" placeholder="Input your name"
+            <input type="text" v-model="name" @input="inputAvatar" placeholder="Input your name"
                 class="input input-bordered input-primary z-10" />
             <!-- button -->
             <div class="action">
@@ -68,12 +78,20 @@ import { onMounted } from 'vue';
 import { background } from '../../components/Particlesjs/particles';
 import { loadSlim } from 'tsparticles-slim';
 import { ref } from "vue"
+import { storeToRefs } from 'pinia'
 import { LottieAnimation } from 'lottie-web-vue';
 import snowman from '../../assets/lottie/snowman.json';
+import { language } from "../../store/language"
+import router from "../../router/index";
 
-const name = ref("")
-const avatar = ref("https://joesch.moe/api/v1/Ebmaj9")
 
+// 多语言
+const useLanguageStore = language();
+const { nowLanguage } = storeToRefs(useLanguageStore) // 当前语言(响应式解构)
+const currentPath = router.currentRoute.value.path.substring(1); // 当前路由
+
+
+// Snow background
 const particlesInit = async (engine) => {
     await loadSlim(engine);
 };
@@ -83,14 +101,13 @@ const particlesLoaded = async container => {
 };
 
 
-const changeScreenValue = ref(true);
-
+// Change screen
+const changeScreenValue = ref(false);
 const changeScreen = () => {
     changeScreenValue.value = !changeScreenValue.value;
-    console.log(changeScreenValue.value);
 
     if (changeScreenValue.value) {
-        // Enter fullscreen
+        // Into fullscreen
         const element = document.documentElement;
 
         if (element.requestFullscreen) {
@@ -115,6 +132,11 @@ const changeScreen = () => {
         }
     }
 };
+
+
+// Use random change avatar
+const name = ref("");
+const avatar = ref("https://joesch.moe/api/v1/Ebmaj9")
 
 const randomAvatar = () => {
     const firstName = [
@@ -200,8 +222,9 @@ const randomAvatar = () => {
     avatar.value = "https://joesch.moe/api/v1/" + name.value
 }
 
-const randomInput = () => {
-    console.log("yes")
+
+// Use input change avatar
+const inputAvatar = () => {
     avatar.value = "https://joesch.moe/api/v1/" + name.value
 
     if (name.value == "") {
