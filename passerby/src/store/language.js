@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import router from "../router/index";
 
 export const language = defineStore("language", {
   state: () => ({
@@ -8,6 +7,7 @@ export const language = defineStore("language", {
       index: {
         zh: {
           title: "欢迎！！！",
+          
         },
         en: {
           title: "Welcome!",

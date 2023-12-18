@@ -1,23 +1,47 @@
 <template>
-    <vue-particles id="tsparticles" :particlesInit="particlesInit" :particlesLoaded="particlesLoaded"
-        url="http://foo.bar/particles.json" />
+    <!-- Snow background -->
     <vue-particles id="tsparticles" :particlesInit="particlesInit" :particlesLoaded="particlesLoaded"
         :options="background" />
+
+
+    <!-- Top-bar -->
     <div class="navbar fixed">
         <!-- Change theme -->
-        <label class="swap swap-rotate">
-            <input type="checkbox" class="theme-controller" value="dracula" />
-            <!-- sun icon -->
-            <a class="btn btn-ghost btn-circle swap-off">
-                <icon-sun size="26" />
-            </a>
-            <!-- moon icon -->
-            <a class="btn btn-ghost btn-circle swap-on">
-                <icon-moon size="26" />
-            </a>
-        </label>
+        <div class="tooltip tooltip-bottom" data-tip="hello">
+            <label class="swap swap-rotate">
+                <input type="checkbox" class="theme-controller" value="dracula" />
+                <!-- sun icon -->
+                <a class="btn btn-ghost btn-circle swap-off">
+                    <icon-sun size="26" />
+                </a>
+                <!-- moon icon -->
+                <a class="btn btn-ghost btn-circle swap-on">
+                    <icon-moon size="26" />
+                </a>
+            </label>
+        </div>
         <!-- change music -->
-        <a class="btn btn-ghost ml-2 btn-circle"><icon-music size="26" /></a>
+        <a class="btn btn-ghost ml-2 btn-circle" onclick="music.showModal()"><icon-music size="26" /></a>
+        <!-- Music dialog     -->
+        <dialog id="music" class="modal">
+            <div class="modal-box p-0">
+                <div class="card lg:card-side bg-base-100 shadow-xl">
+                    <figure><img :src="useMusicStore.playList[nowMusic].img" alt="Album" />
+                    </figure>
+                    <div class="card-body pt-7 pb-7">
+                        <h2 class="card-title">{{ useMusicStore.playList[nowMusic].title }}</h2>
+                        <p>{{ useMusicStore.playList[nowMusic].introduce }}</p>
+                        <div class="card-actions justify-evenly flex-nowrap whitespace-nowrap">
+                            <button @click="useMusicStore.previous()" class="btn btn-ghost btn-circle"><icon-go-start
+                                    size="30" /></button>
+                            <button class="btn btn-ghost btn-circle"><icon-play-one size="30" /></button>
+                            <button @click="useMusicStore.next()" class="btn btn-ghost btn-circle"><icon-go-end
+                                    size="30" /></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </dialog>
         <!-- change language -->
         <details class="dropdown">
             <summary class="m-1 btn btn-ghost ml-2 btn-circle"><icon-translate size="26" /></summary>
@@ -28,7 +52,6 @@
                 <li @click="useLanguageStore.changeLanguage('jp')"><a class="text-xl">🎎日本語</a></li>
             </ul>
         </details>
-
         <!-- Change screen -->
         <label class="swap swap-rotate">
             <input type="checkbox" />
@@ -42,6 +65,9 @@
             </a>
         </label>
     </div>
+
+
+    <!-- main -->
     <div class="content">
         <div class="form">
             <!-- Title -->
@@ -63,12 +89,11 @@
                 <button class="btn z-10" @click="randomAvatar">⭕</button>
                 <label class="swap swap-flip text-4xl">
                     <input type="checkbox" />
-                    <div class="swap-on">👦</div>
-                    <div class="swap-off">👧</div>
+                    <div class="swap-on">👦🏻</div>
+                    <div class="swap-off">👧🏻</div>
                 </label>
                 <button class="btn btn-outline z-10">➡️</button>
             </div>
-
         </div>
     </div>
 </template>
@@ -77,11 +102,12 @@
 import { onMounted } from 'vue';
 import { background } from '../../components/Particlesjs/particles';
 import { loadSlim } from 'tsparticles-slim';
-import { ref } from "vue"
-import { storeToRefs } from 'pinia'
 import { LottieAnimation } from 'lottie-web-vue';
 import snowman from '../../assets/lottie/snowman.json';
+import { ref } from "vue"
+import { storeToRefs } from 'pinia'
 import { language } from "../../store/language"
+import { music } from "../../store/music"
 import router from "../../router/index";
 
 
@@ -90,6 +116,10 @@ const useLanguageStore = language();
 const { nowLanguage } = storeToRefs(useLanguageStore) // 当前语言(响应式解构)
 const currentPath = router.currentRoute.value.path.substring(1); // 当前路由
 
+
+// Music
+const useMusicStore = music()
+const { nowMusic } = storeToRefs(useMusicStore)
 
 // Snow background
 const particlesInit = async (engine) => {
@@ -104,6 +134,7 @@ const particlesLoaded = async container => {
 // Change screen
 const changeScreenValue = ref(false);
 const changeScreen = () => {
+    console.dir(nowMusic.value)
     changeScreenValue.value = !changeScreenValue.value;
 
     if (changeScreenValue.value) {
@@ -271,4 +302,3 @@ const inputAvatar = () => {
     justify-content: space-between;
 }
 </style>
-  
