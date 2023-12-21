@@ -11,7 +11,7 @@
     <!-- Top-bar -->
     <div class="navbar fixed">
         <!-- Change theme -->
-        <div class="tooltip tooltip-bottom" data-tip="Theme">
+        <div class="tooltip tooltip-bottom" :data-tip="useLanguageStore.pages[currentPath][nowLanguage].tipTheme">
             <label class="swap swap-rotate">
                 <input type="checkbox" class="theme-controller" value="dracula" />
                 <!-- sun icon -->
@@ -25,7 +25,7 @@
             </label>
         </div>
         <!-- change music -->
-        <div class="tooltip tooltip-bottom" data-tip="Theme">
+        <div class="tooltip tooltip-bottom" :data-tip="useLanguageStore.pages[currentPath][nowLanguage].tipMusic">
             <a class="btn btn-ghost ml-2 btn-circle" onclick="music.showModal()"><icon-music size="26" /></a>
         </div>
         <!-- Music dialog     -->
@@ -50,7 +50,7 @@
             </div>
         </dialog>
         <!-- change language -->
-        <div class="tooltip tooltip-bottom" data-tip="Lan">
+        <div class="tooltip tooltip-bottom" :data-tip="useLanguageStore.pages[currentPath][nowLanguage].tipLanguage">
             <details class="dropdown">
                 <summary class="m-1 btn btn-ghost ml-2 btn-circle"><icon-translate size="26" /></summary>
                 <ul class="p-2 shadow menu dropdown-content z-20 bg-base-100 rounded-box w-48">
@@ -62,17 +62,19 @@
             </details>
         </div>
         <!-- Change screen -->
-        <label class="swap swap-rotate">
-            <input type="checkbox" />
-            <!-- full screen icon -->
-            <a class="btn btn-ghost btn-circle swap-off" @click="changeScreen">
-                <icon-full-screen size="26" />
-            </a>
-            <!-- off screen icon -->
-            <a class="btn btn-ghost btn-circle swap-on" @click="changeScreen">
-                <icon-off-screen size="26" />
-            </a>
-        </label>
+        <div class="tooltip tooltip-bottom" :data-tip="useLanguageStore.pages[currentPath][nowLanguage].tipScreen">
+            <label class="swap swap-rotate">
+                <input type="checkbox" />
+                <!-- full screen icon -->
+                <a class="btn btn-ghost btn-circle swap-off" @click="changeScreen">
+                    <icon-full-screen size="26" />
+                </a>
+                <!-- off screen icon -->
+                <a class="btn btn-ghost btn-circle swap-on" @click="changeScreen">
+                    <icon-off-screen size="26" />
+                </a>
+            </label>
+        </div>
     </div>
 
 
@@ -91,17 +93,25 @@
                 </div>
             </div>
             <!-- input -->
-            <input type="text" v-model="name" @input="inputAvatar" placeholder="Input your name"
+            <input type="text" v-model="name" @input="inputAvatar"
+                :placeholder="useLanguageStore.pages[currentPath][nowLanguage].tipInputPlaceholder"
                 class="input input-bordered input-primary z-10" />
             <!-- button -->
             <div class="action">
-                <button class="btn z-10" @click="randomAvatar">⭕</button>
-                <label class="swap swap-flip text-4xl">
-                    <input type="checkbox" />
-                    <div class="swap-on">👦🏻</div>
-                    <div class="swap-off">👧🏻</div>
-                </label>
-                <button class="btn btn-outline z-10">➡️</button>
+                <div class="tooltip tooltip-bottom"
+                    :data-tip="useLanguageStore.pages[currentPath][nowLanguage].tipRandomAvatar">
+                    <button class="btn z-10" @click="randomAvatar">⭕</button>
+                </div>
+                <div class="tooltip tooltip-bottom" :data-tip="useLanguageStore.pages[currentPath][nowLanguage].tipGender">
+                    <label class="swap swap-flip text-4xl">
+                        <input type="checkbox" @click="changeGender">
+                        <div class="swap-on">👧🏻</div>
+                        <div class="swap-off">👦🏻</div>
+                    </label>
+                </div>
+                <div class="tooltip tooltip-right" :data-tip="useLanguageStore.pages[currentPath][nowLanguage].tipStart">
+                    <button class="btn btn-outline z-10">➡️</button>
+                </div>
             </div>
         </div>
     </div>
@@ -131,13 +141,13 @@ const playState = ref(true); // 初始状态为未播放
 const useMusicStore = music();
 const { nowMusic } = storeToRefs(useMusicStore);
 const audioPlayer = ref(null);
-
+// Previous music
 const previous = async () => {
     await useMusicStore.previous()
     audioPlayer.value.play()
     console.log(audioPlayer.value.play())
 }
-
+// Start/pause music
 const play = () => {
     playState.value = !playState.value
 
@@ -147,12 +157,12 @@ const play = () => {
         audioPlayer.value.pause()
     }
 }
-
+// Next music
 const next = async () => {
     await useMusicStore.next()
     audioPlayer.value.play()
 }
-
+// Play end --> next music
 const autoNext = async () => {
     await useMusicStore.previous()
     audioPlayer.value.play()
@@ -203,11 +213,19 @@ const changeScreen = () => {
 };
 
 
+
+const changeGenderValue = ref(true)
+const changeGender = () => {
+    changeGenderValue.value = !changeGenderValue.value
+    avatar.value = "https://joesch.moe/api/v1/" + (changeGenderValue.value ? "male" : "female") + "/" + name.value
+}
+
 // Use random change avatar
 const name = ref("");
-const avatar = ref("https://joesch.moe/api/v1/Ebmaj9")
+const avatar = ref("https://joesch.moe/api/v1/male/Ebmaj9")
 
 const randomAvatar = () => {
+    changeGender.value = !changeGender.value
     const firstName = [
         "机智", "聪慧", "勇敢", "谦逊", "宽容", "幽默", "豁达", "快乐", "开朗", "善良",
         "坚定", "勤奋", "正直", "真诚", "温柔", "大方", "深沉", "稳重", "乐观", "理智",
@@ -288,16 +306,16 @@ const randomAvatar = () => {
     const Emoji = getRandomEmoji();
 
     name.value = firstName[Math.round(Math.random() * (firstName.length - 1))] + "的" + lastName[Math.round(Math.random() * (lastName.length - 1))] + Emoji;
-    avatar.value = "https://joesch.moe/api/v1/" + name.value
+    avatar.value = "https://joesch.moe/api/v1/" + (changeGenderValue.value ? "male" : "female") + "/" + name.value;
 }
 
 
 // Use input change avatar
 const inputAvatar = () => {
-    avatar.value = "https://joesch.moe/api/v1/" + name.value
+    avatar.value = "https://joesch.moe/api/v1/" + (changeGenderValue.value ? "male" : "female") + "/" + name.value
 
     if (name.value == "") {
-        avatar.value = "https://joesch.moe/api/v1/Ebmaj9"
+        avatar.value = "https://joesch.moe/api/v1/male/Ebmaj9"
     }
 }
 
