@@ -109,8 +109,8 @@
                         <div class="swap-off">👦🏻</div>
                     </label>
                 </div>
-                <div class="tooltip tooltip-right" :data-tip="useLanguageStore.pages[currentPath][nowLanguage].tipStart">
-                    <button class="btn btn-outline z-10">➡️</button>
+                <div class="tooltip tooltip-bottom" :data-tip="useLanguageStore.pages[currentPath][nowLanguage].tipStart">
+                    <button @click="start" class="btn btn-outline z-10">➡️</button>
                 </div>
             </div>
         </div>
@@ -143,9 +143,13 @@ const { nowMusic } = storeToRefs(useMusicStore);
 const audioPlayer = ref(null);
 // Previous music
 const previous = async () => {
-    await useMusicStore.previous()
-    audioPlayer.value.play()
-    console.log(audioPlayer.value.play())
+    if (playState) {
+        await useMusicStore.next()
+        audioPlayer.value.play()
+    }
+    else {
+        audioPlayer.value.play()
+    }
 }
 // Start/pause music
 const play = () => {
@@ -159,8 +163,13 @@ const play = () => {
 }
 // Next music
 const next = async () => {
-    await useMusicStore.next()
-    audioPlayer.value.play()
+    if (playState) {
+        await useMusicStore.next()
+        audioPlayer.value.play()
+    }
+    else {
+        audioPlayer.value.play()
+    }
 }
 // Play end --> next music
 const autoNext = async () => {
@@ -212,13 +221,6 @@ const changeScreen = () => {
     }
 };
 
-
-
-const changeGenderValue = ref(true)
-const changeGender = () => {
-    changeGenderValue.value = !changeGenderValue.value
-    avatar.value = "https://joesch.moe/api/v1/" + (changeGenderValue.value ? "male" : "female") + "/" + name.value
-}
 
 // Use random change avatar
 const name = ref("");
@@ -316,9 +318,28 @@ const inputAvatar = () => {
 
     if (name.value == "") {
         avatar.value = "https://joesch.moe/api/v1/male/Ebmaj9"
+    } else if (name.value.length > 20) {
+        name.value = name.value.slice(0, 20)
     }
 }
 
+
+// Change gender
+const changeGenderValue = ref(true)
+const changeGender = () => {
+    changeGenderValue.value = !changeGenderValue.value
+    if (name.value == "") {
+        avatar.value = "https://joesch.moe/api/v1/" + (changeGenderValue.value ? "male" : "female") + "/" + "Ebmaj9"
+    } else {
+        avatar.value = "https://joesch.moe/api/v1/" + (changeGenderValue.value ? "male" : "female") + "/" + name.value
+    }
+}
+
+
+// Start chat
+const start = () => {
+    router.push("/chat")
+}
 // onMounted(() => {
 
 // });
