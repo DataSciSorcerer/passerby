@@ -4,7 +4,7 @@ export const language = defineStore("language", {
   state: () => ({
     nowLanguage: "en",
     pages: {
-      index: {
+      home: {
         zh: {
           title: "欢迎！！！",
           tipTheme: "主题",

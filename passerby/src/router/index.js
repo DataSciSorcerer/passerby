@@ -1,13 +1,24 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-import Index from "../pages/index/index.vue";
-import Chat from "../pages/chat/index.vue";
-
 const routes = [
-  { path: "/", redirect: "/index" },
-  { path: "/index", component: Index, name: "Index" },
-  { path: "/chat", component: Chat, name: "Chat" },
+  { path: "/", redirect: "/index/home" },
+  {
+    path: "/index",
+    component: () => import("../pages/index/index.vue"),
+    name: "Index",
+    children: [
+      {
+        path: "home",
+        component: () => import("../pages/home/index.vue"),
+      },
+      {
+        path: "chat",
+        component: () => import("../pages/chat/index.vue"),
+      },
+    ],
+  },
 ];
+
 
 const router = createRouter({
   history: createWebHistory(),
